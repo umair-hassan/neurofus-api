@@ -5,30 +5,32 @@ classdef wattmeter < handle
     properties (SetAccess = private)
        port
        connected = 0; %Default value of connected set to 0 to make sure the user connects the port
+       scan
    end
     properties (Dependent)
         version
-        start
-        stop
+        start %Future Release for continous sampling
+        stop  %Future Release for continous sampling
     end
     properties
         id
         power
         volts
         amps
-        all
-        impedence
+        powervoltagecurrent
+        impedance
         phase
         zero_error
-        digital_filter
+        digital_filter_intensity
         integeration_time
-
+%         digital_filter_setpoint
+%         integeration_time_setpoint
     end
     methods
         
         function obj = wattmeter(PortID)
             % PortID <char> defines the serail port id on your computer
-            % Example: nfs=neurofus('COM6');
+            % Example: nfs=wattmeter('COM8');
             try delete(instrfindall), catch, end
             P = serial(PortID);
             P.BaudRate = 115200;
@@ -72,180 +74,158 @@ classdef wattmeter < handle
             end
             
         end
+        %% id
+        function id = get.id(obj)
+            % Documentation goes here
+            %assert
+            carriage        ='CR';
+            key             ='*IDN?';
+            value           ='';
+            id=obj.process_command(key,value,carriage);
+            obj.id=id;
+            errorOrSuccess=1;
+            deviceResponse=[];
+        end
+        
         %% power
         function power = get.power(obj)
-            power = obj.power;
-        end
-        function obj = set.power(obj, power)
             % Documentation goes here
             %assert
             carriage        ='CR';
-            key             ='BURST';
-            value           =num2str(power);
+            key             ='POW?';
+            value           ='';
+            power=obj.process_command(key,value,carriage);
             obj.power=power;
-            obj.process_command(key,value,carriage);
             errorOrSuccess=1;
             deviceResponse=[];
         end
+        
         %% volts
         function volts = get.volts(obj)
-            volts = obj.volts;
-        end
-        function obj = set.volts(obj, volts)
             % Documentation goes here
             %assert
             carriage        ='CR';
-            key             ='BURST';
-            value           =num2str(volts);
+            key             ='VOLT?';
+            value           ='';
+            volts=obj.process_command(key,value,carriage);
             obj.volts=volts;
-            obj.process_command(key,value,carriage);
             errorOrSuccess=1;
             deviceResponse=[];
         end
+        
         %% amps
         function amps = get.amps(obj)
-            amps = obj.amps;
-        end
-        function obj = set.amps(obj, amps)
             % Documentation goes here
             %assert
             carriage        ='CR';
-            key             ='BURST';
-            value           =num2str(amps);
+            key             ='AMP?';
+            value           ='';
+            amps=obj.process_command(key,value,carriage);
             obj.amps=amps;
-            obj.process_command(key,value,carriage);
             errorOrSuccess=1;
             deviceResponse=[];
         end
-        %% impedence
-        function amps = get.amps(obj)
-            amps = obj.amps;
-        end
-        function obj = set.amps(obj, amps)
+        
+        %% powervoltagecurrent
+        function powervoltagecurrent = get.powervoltagecurrent(obj)
             % Documentation goes here
             %assert
             carriage        ='CR';
-            key             ='BURST';
-            value           =num2str(amps);
-            obj.amps=amps;
-            obj.process_command(key,value,carriage);
+            key             ='ALL?';
+            value           ='';
+            powervoltagecurrent=obj.process_command(key,value,carriage);
+            obj.powervoltagecurrent=powervoltagecurrent;
             errorOrSuccess=1;
             deviceResponse=[];
         end
+        
+        %% impedance
+        function impedance = get.impedance(obj)
+            % Documentation goes here
+            %assert
+            carriage        ='CR';
+            key             ='Z?';
+            value           ='';
+            impedance=obj.process_command(key,value,carriage);
+            obj.impedance=impedance;
+            errorOrSuccess=1;
+            deviceResponse=[];
+        end
+        
         %% phase
-        function amps = get.amps(obj)
-            amps = obj.amps;
-        end
-        function obj = set.amps(obj, amps)
+        function phase = get.phase(obj)
             % Documentation goes here
             %assert
             carriage        ='CR';
-            key             ='BURST';
-            value           =num2str(amps);
-            obj.amps=amps;
-            obj.process_command(key,value,carriage);
+            key             ='ANG?';
+            value           ='';
+            phase=obj.process_command(key,value,carriage);
+            obj.phase=phase;
             errorOrSuccess=1;
             deviceResponse=[];
         end
-        %% zeroerror
-        function amps = get.amps(obj)
-            amps = obj.amps;
-        end
-        function obj = set.amps(obj, amps)
+        
+        %% zero
+        function zero_error = get.zero_error(obj)
             % Documentation goes here
             %assert
             carriage        ='CR';
-            key             ='BURST';
-            value           =num2str(amps);
-            obj.amps=amps;
-            obj.process_command(key,value,carriage);
+            key             ='ZERO';
+            fwrite(obj.port,key,"char");
+            fprintf(obj.port,carriage);
+            zero_error=true;
             errorOrSuccess=1;
             deviceResponse=[];
         end
-        %% digitalfilter
-        function amps = get.amps(obj)
-            amps = obj.amps;
-        end
-        function obj = set.amps(obj, amps)
-            % Documentation goes here
+        
+        %% digital_filter_intensity
+        
+        
+
+        function digital_filter_intensity_out = set_digital_filter_intensity(obj,digital_filter_intensity)
+            % digital_filter_intensity is 1 to 5 integer
             %assert
             carriage        ='CR';
-            key             ='BURST';
-            value           =num2str(amps);
-            obj.amps=amps;
+            key             ='DF';
+            value           =num2str(digital_filter_intensity);
+            
+            obj.digital_filter_intensity=digital_filter_intensity;
+            digital_filter_intensity_out=obj.digital_filter_intensity;
+            
             obj.process_command(key,value,carriage);
-            errorOrSuccess=1;
-            deviceResponse=[];
+            
         end
+        
         %% integeration_time
-        function amps = get.amps(obj)
-            amps = obj.amps;
-        end
-        function obj = set.amps(obj, amps)
-            % Documentation goes here
+        
+        function integeration_time_out = set_integeration_time(obj,integeration_time)
+            % integeration_time is 1 to 4, it sets the length of the
+            % measurement integeration time
             %assert
             carriage        ='CR';
-            key             ='BURST';
-            value           =num2str(amps);
-            obj.amps=amps;
+            key             ='IT';
+            value           =num2str(integeration_time);
+            obj.integeration_time=integeration_time;
             obj.process_command(key,value,carriage);
-            errorOrSuccess=1;
-            deviceResponse=[];
-        end
-        %% all
-        function amps = get.amps(obj)
-            amps = obj.amps;
-        end
-        function obj = set.amps(obj, amps)
-            % Documentation goes here
-            %assert
-            carriage        ='CR';
-            key             ='BURST';
-            value           =num2str(amps);
-            obj.amps=amps;
-            obj.process_command(key,value,carriage);
-            errorOrSuccess=1;
-            deviceResponse=[];
-        end
-        %% id
-        function amps = get.amps(obj)
-            amps = obj.amps;
-        end
-        function obj = set.amps(obj, amps)
-            % Documentation goes here
-            %assert
-            carriage        ='CR';
-            key             ='BURST';
-            value           =num2str(amps);
-            obj.amps=amps;
-            obj.process_command(key,value,carriage);
-            errorOrSuccess=1;
-            deviceResponse=[];
-        end
-        %% start
-        function amps = get.amps(obj)
-            amps = obj.amps;
-        end
-        function obj = set.amps(obj, amps)
-            % Documentation goes here
-            %assert
-            carriage        ='CR';
-            key             ='BURST';
-            value           =num2str(amps);
-            obj.amps=amps;
-            obj.process_command(key,value,carriage);
+            integeration_time_out=obj.integeration_time;
             errorOrSuccess=1;
             deviceResponse=[];
         end
 
         %% Terminal
         
-        function obj=process_command(obj,key,value,carriage)
-            fwrite(obj.port,[key '=' value],"char");
-            fprintf(obj.port,carriage);
+        function process_out=process_command(obj,key,value,carriage)
+            if isempty(value)
+                fwrite(obj.port,key,"char");
+                fprintf(obj.port,carriage);
+                process_out=fscanf(obj.port);
+            else
+                fwrite(obj.port,[key '=' value],"char");
+                fprintf(obj.port,carriage);
+                process_out=true;
+            end
         end
-        
-        
+
     end
 end
 
