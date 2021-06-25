@@ -204,6 +204,49 @@ classdef neurofus < handle
             errorOrSuccess=1;
             deviceResponse=[];
         end
+         %% ramp_mode
+        function ramp_mode = get.ramp_mode(obj)
+            ramp_mode = obj.ramp_mode;
+        end
+        function obj = set.ramp_mode(obj, ramp_mode)
+            % Documentation goes here
+            %Sets the TPO to ramp at the beginning and end of each burst
+            %with the following types of ramping styles
+            %             0 = No ramping
+            %             1= Linear
+            %             2=Tukey
+            %             3=Log
+            %             4=Exponential
+            %assert
+            carriage        ='CR';
+            key             ='RAMPMODE';
+            value           =num2str(ramp_mode);
+            obj.ramp_mode=ramp_mode;
+            obj.process_command(key,value,carriage);
+            errorOrSuccess=1;
+            deviceResponse=[];
+        end
+         %% ramp_length
+        function ramp_length = get.ramp_length(obj)
+            ramp_length = obj.ramp_length;
+        end
+        function obj = set.ramp_length(obj, ramp_length)
+            % Documentation goes here
+            %Specifies the time duration over which ramping occurs:
+            %10us-20ms in 10us steps
+            %Since the ramp length acts on both the start and end of the
+            %burst waveforms, the user should ensure the burst length is at
+            %least twice the duration of the ramp length in use.
+            %assert
+            carriage        ='CR';
+            key             ='RAMPLENGTH';
+            value           =num2str(ramp_length);
+            obj.ramp_length=ramp_length;
+            obj.process_command(key,value,carriage);
+            errorOrSuccess=1;
+            deviceResponse=[];
+        end
+        
         %% Terminal
         
         function obj=process_command(obj,key,value,carriage)
