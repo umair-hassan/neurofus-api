@@ -45,7 +45,6 @@ classdef neurofus < handle
         function obj = neurofus(PortID)
             % PortID <char> defines the serail port id on your computer
             % Example: nfs=neurofus('COM6');
-            try delete(instrfindall), catch, end
             P = serial(PortID);
             P.BaudRate = 115200;
             P.DataBits = 8;
@@ -87,6 +86,9 @@ classdef neurofus < handle
                 deviceResponse = [];
             end
             
+        end
+        function clear(obj)
+            try delete(instrfindall), catch, end
         end
         %% arm
         function obj = arm(obj)
@@ -257,5 +259,4 @@ classdef neurofus < handle
         
     end
 end
-
 
