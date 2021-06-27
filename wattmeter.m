@@ -31,7 +31,6 @@ classdef wattmeter < handle
         function obj = wattmeter(PortID)
             % PortID <char> defines the serail port id on your computer
             % Example: nfs=wattmeter('COM8');
-            try delete(instrfindall), catch, end
             P = serial(PortID);
             P.BaudRate = 115200;
             P.DataBits = 8;
@@ -73,6 +72,9 @@ classdef wattmeter < handle
                 deviceResponse = [];
             end
             
+        end
+        function clear(obj)
+            try delete(instrfindall), catch, end
         end
         %% id
         function id = get.id(obj)
