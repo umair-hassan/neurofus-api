@@ -92,12 +92,12 @@ classdef neurofus < handle
         end
         %% arm
         function obj = arm(obj)
-            obj.armed = 'yes';
+            obj.trigger_mode=2;
         end
         
         %% disarm
         function obj = disarm(obj)
-            obj.armed = 'no';
+            obj.trigger_mode=0;
         end
         %% start
         %% stop
